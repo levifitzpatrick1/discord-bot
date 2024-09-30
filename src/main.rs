@@ -15,6 +15,7 @@ impl EventHandler for Handler {
         match msg.content.as_str() {
             "ping!" => ping_response(ctx, msg).await,
             "help!" => help_response(ctx, msg).await,
+            "Test!" => test_response(ctx, msg).await,
             _ => do_nothing().await,
         }
     }

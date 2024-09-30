@@ -13,4 +13,10 @@ pub async fn help_response(ctx: Context, msg: Message) {
     }
 }
 
+pub async fn test_response(ctx: Context, msg: Message) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "this is a test").await {
+        println!("Error sending message: {why:?}")
+    }
+}
+
 pub async fn do_nothing() {}
