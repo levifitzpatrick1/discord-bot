@@ -9,7 +9,7 @@ use responses::raiderio_responses::*;
 
 #[tokio::main]
 async fn main() {
-    let commands = vec![test(), progression()];
+    let commands = vec![test(), progression(), character_progression()];
     let _ = dotenv();
     let token = env::var("DISCORD_TOKEN").expect("missing DISCORD_TOKEN");
     let intents = serenity::GatewayIntents::non_privileged();

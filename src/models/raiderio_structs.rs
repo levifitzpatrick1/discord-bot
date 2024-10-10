@@ -17,12 +17,18 @@ pub struct GuildProfile {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct GuildProfileMembers {
+    pub name: String,
+    pub members: Vec<GuildMember>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GuildMember {
     pub rank: u8,
     pub character: Character,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Character {
     pub name: String,
     pub realm: String,
