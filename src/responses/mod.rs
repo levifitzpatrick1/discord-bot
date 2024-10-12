@@ -1,2 +1,3 @@
 pub mod basic;
-pub mod raiderio_responses;
+pub mod progress_responses;
+pub mod crafting_responses;

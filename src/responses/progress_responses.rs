@@ -1,6 +1,9 @@
+use crate::db::db_init::get_db_path;
 use crate::models::poise_required_structs::{Context, Error as poise_Error};
-use crate::models::raiderio_structs::*;
+use crate::models::db_structs::Character;
+use crate::models::raiderio_structs::GuildProfile;
 use reqwest::Error as reqwest_error;
+use rusqlite::{params, Connection, Result as SqliteResult};
 
 #[poise::command(slash_command, prefix_command)]
 pub async fn progression(ctx: Context<'_>) -> Result<(), poise_Error> {
@@ -10,13 +13,15 @@ pub async fn progression(ctx: Context<'_>) -> Result<(), poise_Error> {
 }
 
 #[poise::command(slash_command, prefix_command)]
-pub async fn character_progression(ctx: Context<'_>) -> Result<(), poise_Error> {
-    let message = all_characters_scores_message().await.unwrap();
+pub async fn character_progression(ctx: Context<'_>,
+#[description = "Character Name"] character_name: String) -> Result<(), poise_Error> {
+    let _ = ctx.defer().await;
+    let message = character_score_message(character_name).unwrap();
     ctx.say(message).await?;
     Ok(())
 }
 
-pub async fn raid_progress_message() -> Result<String, reqwest_error> {
+async fn raid_progress_message() -> Result<String, reqwest_error> {
     let url = "https://raider.io/api/v1/guilds/profile?region=us&realm=arthas&name=mud%20hut%20gang&fields=raid_progression";
 
     let response: GuildProfile = reqwest::get(url).await?.json().await?;
@@ -40,19 +45,41 @@ pub async fn raid_progress_message() -> Result<String, reqwest_error> {
     Ok(progress_message)
 }
 
-pub async fn all_characters_scores_message() -> Result<String, reqwest_error> {
-    let members = get_characters_in_guild().await?;
+fn character_score_message(name: String) -> SqliteResult<String> {
+    let conn = Connection::open(get_db_path())?;
+    let mut stmt = conn.prepare(
+        "SELECT guid, name, server, guild, raiderio_score, level
+        FROM characters
+        WHERE name = ?1"
+    )?;
 
-    let mut message: String = format!("Scores for Mud Hut Gang");
+    let character_iter = stmt.query_map(params![name], |row| {
+        Ok(Character {
+            guid: row.get(0)?,
+            name: row.get(1)?,
+            server: row.get(2)?,
+            guild: row.get(3)?,
+            raiderio_score: row.get(4)?,
+            level: row.get(5)?
+        })
+    })?;
 
-    for member in members {
-        let score = get_character_score(member.clone().character).await?;
-        let member_message = &format!("{} : {}\n", member.character.name, score);
-        print!("{}", member_message);
-        message.push_str(member_message);
-    }
+    let characters = character_iter.collect::<Result<Vec<_>, _>>()?;
+    let character = characters.first();
+
+    let message = match character {
+        Some(char) => format!(
+            "Name: {}, Server: {}, Score: {}, Level: {}",
+            char.name,
+            char.server,
+            char.raiderio_score.unwrap_or(0.0),
+            char.level
+        ),
+        None => format!("No character found with the name {}", name),
+    };
 
     Ok(message)
+
 }
 
 fn to_title_case(s: &str) -> String {
@@ -72,22 +99,3 @@ fn to_title_case(s: &str) -> String {
         .join(" ")
 }
 
-pub async fn get_characters_in_guild() -> Result<Vec<GuildMember>, reqwest_error> {
-    let url = "https://raider.io/api/v1/guilds/profile?region=us&realm=arthas&name=mud%20hut%20gang&fields=members";
-
-    let response: GuildProfileMembers = reqwest::get(url).await?.json().await?;
-    println!("got guild members: {}", response.members.len());
-    Ok(response.members)
-}
-
-pub async fn get_character_score(character: Character) -> Result<f32, reqwest_error> {
-    let url = format!("https://raider.io/api/v1/characters/profile?region=us&realm={}&name={}&fields=mythic_plus_scores_by_season%3Acurrent", character.realm, character.name);
-
-    let response: CharacterProfile = reqwest::get(url).await?.json().await?;
-    Ok(response
-        .mythic_plus_scores_by_season
-        .first()
-        .unwrap()
-        .scores
-        .all)
-}

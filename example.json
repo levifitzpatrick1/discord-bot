@@ -1,0 +1,88 @@
+{
+    "_links":  {
+                   "self":  {
+                                "href":  "https://us.api.blizzard.com/data/wow/guild/arthas/mud-hut-gang/roster?namespace=profile-us"
+                            }
+               },
+    "guild":  {
+                  "key":  {
+                              "href":  "https://us.api.blizzard.com/data/wow/guild/arthas/mud-hut-gang?namespace=profile-us"
+                          },
+                  "name":  "Mud Hut Gang",
+                  "id":  100028550,
+                  "realm":  {
+                                "key":  {
+                                            "href":  "https://us.api.blizzard.com/data/wow/realm/69?namespace=dynamic-us"
+                                        },
+                                "name":  "Arthas",
+                                "id":  69,
+                                "slug":  "arthas"
+                            },
+                  "faction":  {
+                                  "type":  "HORDE",
+                                  "name":  "Horde"
+                              }
+              },
+    "members":  [
+                    {
+                        "character":  {
+                                          "key":  {
+                                                      "href":  "https://us.api.blizzard.com/profile/wow/character/stormreaver/fumblebuck?namespace=profile-us"
+                                                  },
+                                          "name":  "Fumblebuck",
+                                          "id":  51980754,
+                                          "realm":  {
+                                                        "key":  {
+                                                                    "href":  "https://us.api.blizzard.com/data/wow/realm/58?namespace=dynamic-us"
+                                                                },
+                                                        "id":  58,
+                                                        "slug":  "stormreaver"
+                                                    },
+                                          "level":  70,
+                                          "playable_class":  {
+                                                                 "key":  {
+                                                                             "href":  "https://us.api.blizzard.com/data/wow/playable-class/8?namespace=static-11.0.2_55938-us"
+                                                                         },
+                                                                 "id":  8
+                                                             },
+                                          "playable_race":  {
+                                                                "key":  {
+                                                                            "href":  "https://us.api.blizzard.com/data/wow/playable-race/11?namespace=static-11.0.2_55938-us"
+                                                                        },
+                                                                "id":  11
+                                                            }
+                                      },
+                        "rank":  4
+                    },
+                    {
+                        "character":  {
+                                          "key":  {
+                                                      "href":  "https://us.api.blizzard.com/profile/wow/character/zuljin/banjaxed?namespace=profile-us"
+                                                  },
+                                          "name":  "Banjaxed",
+                                          "id":  170363096,
+                                          "realm":  {
+                                                        "key":  {
+                                                                    "href":  "https://us.api.blizzard.com/data/wow/realm/61?namespace=dynamic-us"
+                                                                },
+                                                        "id":  61,
+                                                        "slug":  "zuljin"
+                                                    },
+                                          "level":  80,
+                                          "playable_class":  {
+                                                                 "key":  {
+                                                                             "href":  "https://us.api.blizzard.com/data/wow/playable-class/1?namespace=static-11.0.2_55938-us"
+                                                                         },
+                                                                 "id":  1
+                                                             },
+                                          "playable_race":  {
+                                                                "key":  {
+                                                                            "href":  "https://us.api.blizzard.com/data/wow/playable-race/31?namespace=static-11.0.2_55938-us"
+                                                                        },
+                                                                "id":  31
+                                                            }
+                                      },
+                        "rank":  4
+                    }
+                ]
+}
