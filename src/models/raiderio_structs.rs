@@ -35,19 +35,3 @@ pub struct Character {
     pub class: String,
     pub active_spec_name: String,
 }
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CharacterProfile {
-    pub mythic_plus_scores_by_season: Vec<Season>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Season {
-    pub season: String,
-    pub scores: Scores,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Scores {
-    pub all: f32,
-}

@@ -5,7 +5,7 @@ pub struct ProfileResponse {
     pub _links: Links,
     pub character: Character,
     pub primaries: Vec<PrimaryProfession>,
-    pub secondaries: Vec<SecondaryProfession>,
+    //pub secondaries: Vec<SecondaryProfession>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -27,7 +27,7 @@ pub struct Character {
     pub realm: Realm,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct KeyHref {
     pub href: String,
 }
@@ -40,20 +40,20 @@ pub struct Realm {
     pub slug: String,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct PrimaryProfession {
     pub profession: Profession,
     pub tiers: Vec<Tier>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Profession {
     pub key: KeyHref,
     pub name: String,
     pub id: u32,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Tier {
     pub skill_points: u32,
     pub max_skill_points: u32,
@@ -61,13 +61,13 @@ pub struct Tier {
     pub known_recipes: Vec<Recipe>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct TierInfo {
     pub name: String,
     pub id: u32,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Recipe {
     pub key: KeyHref,
     pub name: String,

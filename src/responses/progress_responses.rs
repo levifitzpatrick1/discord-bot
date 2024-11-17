@@ -48,7 +48,7 @@ async fn raid_progress_message() -> Result<String, reqwest_error> {
 fn character_score_message(name: String) -> SqliteResult<String> {
     let conn = Connection::open(get_db_path())?;
     let mut stmt = conn.prepare(
-        "SELECT guid, name, server, guild, raiderio_score, level
+        "SELECT guid, name, server, guild, score, level
         FROM characters
         WHERE name = ?1"
     )?;
@@ -59,7 +59,7 @@ fn character_score_message(name: String) -> SqliteResult<String> {
             name: row.get(1)?,
             server: row.get(2)?,
             guild: row.get(3)?,
-            raiderio_score: row.get(4)?,
+            score: row.get(4)?,
             level: row.get(5)?
         })
     })?;
@@ -69,11 +69,10 @@ fn character_score_message(name: String) -> SqliteResult<String> {
 
     let message = match character {
         Some(char) => format!(
-            "Name: {}, Server: {}, Score: {}, Level: {}",
+            "Name: {}, Server: {}, Score: {}",
             char.name,
             char.server,
-            char.raiderio_score.unwrap_or(0.0),
-            char.level
+            char.score.unwrap_or(0.0)
         ),
         None => format!("No character found with the name {}", name),
     };

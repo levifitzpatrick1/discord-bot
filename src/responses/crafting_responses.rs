@@ -56,7 +56,7 @@ fn format_crafting_response(recipe: &Recipe, crafters: &[Character], materials: 
 fn get_crafters(recipe: &Recipe) -> SqliteResult<Vec<Character>> {
     let conn = Connection::open(get_db_path())?;
     let mut stmt = conn.prepare("
-    SELECT c.guid, c.name, c.server, c.guild, c.raiderio_score, c.level
+    SELECT c.guid, c.name, c.server, c.guild, c.score, c.level
     FROM characters c
     JOIN character_recipes cr ON c.guid = cr.character_guid
     WHERE cr.recipe_guid = ?1
@@ -68,7 +68,7 @@ fn get_crafters(recipe: &Recipe) -> SqliteResult<Vec<Character>> {
             name: row.get(1)?,
             server: row.get(2)?,
             guild: row.get(3)?,
-            raiderio_score: row.get(4)?,
+            score: row.get(4)?,
             level: row.get(5)?
         })
     })?;

@@ -1,5 +1,7 @@
 pub mod character_professions;
 pub mod guild;
+pub mod character_score;
+pub mod recipe_materials;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

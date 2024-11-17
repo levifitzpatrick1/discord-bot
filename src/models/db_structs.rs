@@ -2,7 +2,7 @@ use rusqlite::{params, Connection, Result as SqliteResult};
 use serde::{Serialize, Deserialize};
 use crate::db::db_init::get_db_path;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq)]
 pub struct Material {
     pub guid: String,
     pub wow_id: i32,
@@ -13,9 +13,9 @@ pub struct Material {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Recipe {
     pub guid: String,
-    pub wow_id: i32,
+    pub wow_id: u32,
     pub name: String,
-    pub profession: String,
+    pub profession: String
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,8 +31,8 @@ pub struct Character {
     pub name: String,
     pub server: String,
     pub guild: String,
-    pub raiderio_score: Option<f64>,
-    pub level: i32,
+    pub score: Option<f64>,
+    pub level: i32
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -133,8 +133,8 @@ impl DbOperations for Character {
     fn insert(&self) -> SqliteResult<()> {
         let conn = Connection::open(get_db_path())?;
         conn.execute(
-            "INSERT INTO characters (guid, name, server, guild, raiderio_score, level) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-            params![self.guid, self.name, self.server, self.guild, self.raiderio_score, self.level],
+            "INSERT INTO characters (guid, name, server, guild, score, level) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            params![self.guid, self.name, self.server, self.guild, self.score, self.level],
         )?;
         Ok(())
     }
@@ -142,8 +142,8 @@ impl DbOperations for Character {
     fn update(&self) -> SqliteResult<()> {
         let conn = Connection::open(get_db_path())?;
         conn.execute(
-            "UPDATE characters SET name = ?1, server = ?2, guild = ?3 raiderio_score = ?4, level = ?5 WHERE guid = ?6",
-            params![self.name, self.server, self.raiderio_score, self.level, self.guid],
+            "UPDATE characters SET name = ?1, server = ?2, guild = ?3 score = ?4, level = ?5 WHERE guid = ?6",
+            params![self.name, self.server, self.score, self.level, self.guid],
         )?;
         Ok(())
     }
@@ -225,7 +225,7 @@ impl Material {
 impl Recipe {
     pub fn find_by_name(name: &str) -> SqliteResult<Vec<Recipe>> {
         let conn = Connection::open(get_db_path())?;
-        let mut stmt = conn.prepare("SELECT guid, wow_id, name, profesion FROM recipes WHERE name LIKE ?1")?;
+        let mut stmt = conn.prepare("SELECT guid, wow_id, name, profession FROM recipes WHERE name LIKE ?1")?;
         let recipe_iter = stmt.query_map(params![format!("%{}%", name)], |row| {
             Ok(Recipe {
                 guid: row.get(0)?,

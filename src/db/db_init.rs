@@ -3,6 +3,7 @@ use rusqlite::{Connection, Result};
 
 pub fn init_db() -> Result<()> {
     let db_path = get_db_path();
+    println!("db hosted at {:?}", db_path);
 
     if let Some(parent) = db_path.parent() {
         let _ = fs::create_dir_all(parent);
@@ -11,9 +12,11 @@ pub fn init_db() -> Result<()> {
     let conn = Connection::open(&db_path)?;
     conn.execute("PRAGMA foreign_keys = ON", [])?;
 
+    println!("Creating tables");
     if let Err(err) = create_tables(&conn) {
         eprintln!("Error creating tables at {:?}: {}", db_path, err)
     }
+    println!("Done creating tables");
 
     Ok(())
 }
@@ -21,7 +24,7 @@ pub fn init_db() -> Result<()> {
 pub fn get_db_path() -> PathBuf {
     env::var("DB_PATH")
     .map(PathBuf::from)
-    .unwrap_or_else(|_| PathBuf::from("/app/data/bot_data.db"))
+    .unwrap_or_else(|_| PathBuf::from("H:/Programming-stuff/Rust/discord-bot/test_db/bot_data.db"))
 }
 
 
@@ -43,7 +46,8 @@ fn create_tables(conn: &Connection) -> Result<()> {
             guid TEXT PRIMARY KEY,
             wow_id INTEGER NOT NULL,
             name TEXT NOT NULL,
-            profession TEXT NOT NULL
+            profession TEXT NOT NULL,
+            teir TEXT NOT NULL
         )",
         [],
     )?;
@@ -68,7 +72,7 @@ fn create_tables(conn: &Connection) -> Result<()> {
             name TEXT NOT NULL,
             server TEXT NOT NULL,
             guild TEXT,
-            raiderio_score REAL,
+            score REAL,
             level INTEGER NOT NULL
         )",
         [],

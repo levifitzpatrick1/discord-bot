@@ -1,27 +1,35 @@
-use auth::get_oath_token;
-use db::db_init::init_db;
+use auth::get_oauth_token;
+use db::{db_init::init_db, db_updates::schedule_data_updates};
 use dotenvy::dotenv;
+use models::poise_required_structs::Data;
 use poise::serenity_prelude as serenity;
-use responses::crafting_responses::craft_request;
+use responses::{crafting_responses::craft_request, progress_responses::{character_progression, progression}, basic::test};
 use std::env;
+
 mod models;
 mod responses;
 mod db;
 mod auth;
-use models::poise_required_structs::*;
-use responses::basic::*;
-use responses::progress_responses::*;
-use db::db_updates::schedule_data_updates;
 
 #[tokio::main]
 async fn main() {
-    let _ = init_db();
-    let commands = vec![test(), progression(), character_progression(), craft_request()];
     let _ = dotenv();
-    let _ = get_oath_token();
+    let _ = get_oauth_token().await;
+    if let Err(err) = init_db() {
+        eprint!("Error initing db: {}", err);
+    }
+    if let Err(err) = schedule_data_updates().await {
+        eprintln!("Error in scheduled update: {}", err);
+    }
+
+    
     let token = env::var("DISCORD_TOKEN").expect("missing DISCORD_TOKEN");
     let intents = serenity::GatewayIntents::non_privileged();
 
+    // Define commands for the bot
+    let commands = vec![test(), progression(), character_progression(), craft_request()];
+
+    // Set up the Discord bot framework
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands,
@@ -30,17 +38,16 @@ async fn main() {
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(Data { })
             })
         })
         .build();
 
-    let client = serenity::ClientBuilder::new(token, intents)
+    // Create and run the Discord client
+    let mut client = serenity::ClientBuilder::new(token, intents)
         .framework(framework)
-        .await;
-    client.unwrap().start().await.unwrap();
+        .await
+        .unwrap();
 
-    if let Err(err) = schedule_data_updates().await {
-        eprintln!("Error in scheduled update: {}", err);
-    }
+    client.start().await.unwrap();
 }
