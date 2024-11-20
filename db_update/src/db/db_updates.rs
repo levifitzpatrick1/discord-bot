@@ -89,6 +89,7 @@ fn collect_db_characters(conn: &Connection) -> SqliteResult<Vec<Character>> {
 
 async fn update_guild_roster_data(conn: &Connection) -> Result<(), Box<dyn std::error::Error>> {
     let api_key = get_global_token();
+    println!("{}", api_key);
     let guild = "mud-hut-gang";
     let url = format!("https://{region}.api.blizzard.com/data/wow/guild/{realm_slug}/{name_slug}/roster?namespace={namespace}&locale={locale}&access_token={api_key}",
     region = "us",
@@ -98,26 +99,27 @@ async fn update_guild_roster_data(conn: &Connection) -> Result<(), Box<dyn std::
     locale = "en_US",
     api_key = api_key);
     let response = reqwest::get(&url).await?;
+    println!("{}", url);
+    println!("{:?}", response);
+    // let profile: GuildRosterResponse = response.json().await?;
 
-    let profile: GuildRosterResponse = response.json().await?;
+    // for member in profile.members {
+    //     println!("updating character: {}-{}", member.character.name, member.character.realm.slug);
+    //     let mut stmt = conn.prepare("SELECT level FROM characters WHERE name = ?1 AND server =?2")?;
+    //     let member_exists = stmt.exists(params![member.character.name, member.character.realm.slug])?;
 
-    for member in profile.members {
-        println!("updating character: {}-{}", member.character.name, member.character.realm.slug);
-        let mut stmt = conn.prepare("SELECT level FROM characters WHERE name = ?1 AND server =?2")?;
-        let member_exists = stmt.exists(params![member.character.name, member.character.realm.slug])?;
+    //     if !member_exists {
+    //         conn.execute("INSERT INTO characters (guid, name, server, guild, level) VALUES (?, ?, ?, ?, ?)",
+    //          params![generate_guid(), member.character.name, member.character.realm.slug, guild, member.character.level])?;
+    //     } else {
+    //         let db_level: u32 = conn.query_row("SELECT level FROM characters WHERE name = ?1 AND server = ?2", params![member.character.name, member.character.realm.slug], |row| row.get(0),)?;
 
-        if !member_exists {
-            conn.execute("INSERT INTO characters (guid, name, server, guild, level) VALUES (?, ?, ?, ?, ?)",
-             params![generate_guid(), member.character.name, member.character.realm.slug, guild, member.character.level])?;
-        } else {
-            let db_level: u32 = conn.query_row("SELECT level FROM characters WHERE name = ?1 AND server = ?2", params![member.character.name, member.character.realm.slug], |row| row.get(0),)?;
+    //         if db_level != member.character.level {
+    //             conn.execute("UPDATE characters SET level = ?1 WHERE name = ?2 AND server =?3", params![member.character.level, member.character.name, member.character.realm.slug])?;
 
-            if db_level != member.character.level {
-                conn.execute("UPDATE characters SET level = ?1 WHERE name = ?2 AND server =?3", params![member.character.level, member.character.name, member.character.realm.slug])?;
-
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 
     Ok(())
 }
@@ -169,14 +171,19 @@ async fn update_character_profession_data(conn: &Connection, character: &Charact
     println!("Checking recipes for {}", character.name);
     
     for profession in &professions.primaries {
-        for teir in &profession.tiers {
-            println!("Processing profession tier: {}", teir.tier.name);
+        for tier in &profession.tiers {
+            if !tier.tier.name.contains("Algari") {
+                println!("Skipping non-War Within tier: {}", tier.tier.name);
+                continue;
+            }
 
-            let recipes_from_api: &Vec<RecipeAPI> = &teir.known_recipes;
+            println!("Processing profession tier: {}", tier.tier.name);
+
+            let recipes_from_api: &Vec<RecipeAPI> = &tier.known_recipes;
             let profession_name = &profession.profession.name;
-            let teir_name = &teir.tier.name;
+            let tier_name = &tier.tier.name;
 
-            match fetch_and_sync_recipes(conn, recipes_from_api, profession_name, teir_name).await {
+            match fetch_and_sync_recipes(conn, recipes_from_api, profession_name, tier_name).await {
                 Ok(recipes) => {
                     for recipe in recipes {
                         if let Err(err) = sync_recipe_to_character(conn, &recipe, character, log_entries) {
@@ -192,7 +199,6 @@ async fn update_character_profession_data(conn: &Connection, character: &Charact
     }
 
     Ok(())
-
 }
 
 fn sync_recipe_to_character(conn: &Connection, recipe: &RecipeDB, character: &Character, log_entries: &mut Vec<String>) -> SqliteResult<()> {

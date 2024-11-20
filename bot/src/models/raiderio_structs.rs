@@ -35,3 +35,22 @@ pub struct Character {
     pub class: String,
     pub active_spec_name: String,
 }
+
+
+#[derive(Debug, Deserialize)]
+pub struct CharacterResponse {
+    pub name: String,
+    pub realm: String,
+    pub mythic_plus_scores_by_season: Vec<MythicPlusSeason>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MythicPlusSeason {
+    pub season: String,
+    pub scores: Scores,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Scores {
+    pub all: f64,
+}

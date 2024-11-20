@@ -1,7 +1,8 @@
 
+use std::env;
+
 use rusqlite::{params, Connection, Result as SqliteResult};
 use crate::models::poise_required_structs::{Context, Error as poise_Error};
-use crate::db::db_init::get_db_path;
 use crate::models::db_structs::Character;
 use crate::models::db_structs::Material;
 use crate::models::db_structs::Recipe;
@@ -54,7 +55,8 @@ fn format_crafting_response(recipe: &Recipe, crafters: &[Character], materials: 
 }
 
 fn get_crafters(recipe: &Recipe) -> SqliteResult<Vec<Character>> {
-    let conn = Connection::open(get_db_path())?;
+    let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:///app/data/bot.db".to_string());
+    let conn = Connection::open(db_url)?;
     let mut stmt = conn.prepare("
     SELECT c.guid, c.name, c.server, c.guild, c.score, c.level
     FROM characters c
