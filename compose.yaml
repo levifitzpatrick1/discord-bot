@@ -2,9 +2,7 @@ version: '0.1'
 
 services:
   server:
-    build:
-      context: ./bot
-      target: final
+    build: bot
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
       - BLIZZARD_CLIENT_ID=${BLIZZARD_CLIENT_ID}
@@ -20,8 +18,7 @@ services:
     restart: unless-stopped
 
   updater:
-    build:
-      context: ./db_updater
+    build: db_update
     environment:
       - DATABASE_URL=/app/data/bot.db
       - BLIZZARD_CLIENT_ID=${BLIZZARD_CLIENT_ID}
