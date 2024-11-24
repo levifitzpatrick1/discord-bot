@@ -29,8 +29,8 @@ jobs:
           context: ./bot
           push: true
           tags: |
-            wow-discord-bot:latest
-            wow-discord-bot:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/wow-discord-bot:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/wow-discord-bot:${{ github.sha }}
 
       - name: Build and push updater image
         uses: docker/build-push-action@v5
@@ -38,5 +38,5 @@ jobs:
           context: ./db_update
           push: true
           tags: |
-            wow-discord-bot-updater:latest
-            wow-discord-bot-updater:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/wow-discord-bot-updater:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/wow-discord-bot-updater:${{ github.sha }}
