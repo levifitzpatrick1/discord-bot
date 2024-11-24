@@ -3,7 +3,7 @@ version: '0.1'
 services:
   server:
     build:
-      context: .
+      context: ./bot
       target: final
     environment:
       - DISCORD_TOKEN=${DISCORD_TOKEN}
@@ -17,16 +17,18 @@ services:
       - bot-data:/app/data
     depends_on:
       - updater
+    restart: unless-stopped
 
   updater:
     build:
-      context: ./updater
+      context: ./db_updater
     environment:
       - DATABASE_URL=/app/data/bot.db
       - BLIZZARD_CLIENT_ID=${BLIZZARD_CLIENT_ID}
       - BLIZZARD_CLIENT_SECRET=${BLIZZARD_CLIENT_SECRET}
     volumes:
       - bot-data:/app/data
+    restart: unless-stopped
 
 volumes:
   bot-data:
