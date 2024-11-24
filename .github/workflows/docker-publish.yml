@@ -28,5 +28,3 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/discord-bot:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/discord-bot:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/discord-bot:cache
-          cache-to: type=registry,mode=max,ref=${{ secrets.DOCKERHUB_USERNAME }}/discord-bot:cache
