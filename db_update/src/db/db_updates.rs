@@ -59,7 +59,6 @@ pub async fn schedule_data_updates() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     for log_entry in log_entries {
-        println!("{}", log_entry);
     }
 
         let elapsed = start.elapsed();
@@ -89,7 +88,6 @@ fn collect_db_characters(conn: &Connection) -> SqliteResult<Vec<Character>> {
 
 async fn update_guild_roster_data(conn: &Connection) -> Result<(), Box<dyn std::error::Error>> {
     let api_key = get_global_token();
-    println!("{}", api_key);
     let guild = "mud-hut-gang";
     let url = format!("https://{region}.api.blizzard.com/data/wow/guild/{realm_slug}/{name_slug}/roster?namespace={namespace}&locale={locale}",
     region = "us",
@@ -110,7 +108,6 @@ async fn update_guild_roster_data(conn: &Connection) -> Result<(), Box<dyn std::
     let profile: GuildRosterResponse = response.json().await?;
 
     for member in profile.members {
-        println!("updating character: {}-{}", member.character.name, member.character.realm.slug);
         let mut stmt = conn.prepare("SELECT level FROM characters WHERE name = ?1 AND server =?2")?;
         let member_exists = stmt.exists(params![member.character.name, member.character.realm.slug])?;
 
@@ -189,16 +186,12 @@ async fn fetch_character_professions_data(name: &str, server: &str) -> Result<Pr
 }
 
 async fn update_character_profession_data(conn: &Connection, character: &Character, professions: &ProfileResponse, log_entries: &mut Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Checking recipes for {}", character.name);
-    
+
     for profession in &professions.primaries {
         for tier in &profession.tiers {
             if !tier.tier.name.contains("Khaz Algar") {
-                println!("Skipping non-War Within tier: {}", tier.tier.name);
                 continue;
             }
-
-            println!("Processing profession tier: {}", tier.tier.name);
 
             let recipes_from_api: &Vec<RecipeAPI> = &tier.known_recipes;
             let profession_name = &profession.profession.name;
@@ -315,8 +308,6 @@ async fn fetch_and_sync_materials(conn: &Connection, recipe_id: u32) -> Result<H
                 );
             }
         }
-    } else {
-        println!("No reagents found for recipe ID: {}", recipe_id);
     }
 
 

@@ -63,7 +63,7 @@ pub async fn update_character(
 
 fn handle_character_db_operations(name: &str, server: &str) -> SqliteResult<String> {
     let db_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        .unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
     let conn = Connection::open(db_url)?;
     
     let mut stmt = conn.prepare(
@@ -126,7 +126,7 @@ async fn raid_progress_message() -> Result<String, reqwest_error> {
 
 fn update_character_in_db(name: &str, server: &str, score: f64) -> SqliteResult<String> {
     let db_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        .unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
     let conn = Connection::open(db_url)?;
 
     let mut stmt = conn.prepare(

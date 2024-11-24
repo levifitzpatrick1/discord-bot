@@ -13,7 +13,6 @@ pub async fn get_oauth_token() -> Result<String, Box<dyn std::error::Error>> {
     {
         let token = ACCESS_TOKEN.lock().unwrap();
         if let Some(existing_token) = token.clone() {
-            println!("Using existing token: {}", existing_token);
             return Ok(existing_token);
         }
     }
@@ -21,7 +20,6 @@ pub async fn get_oauth_token() -> Result<String, Box<dyn std::error::Error>> {
     let client_id = env::var("BLIZZARD_CLIENT_ID").expect("Missing BLIZZARD_CLIENT_ID");
     let client_secret = env::var("BLIZZARD_CLIENT_SECRET").expect("Missing BLIZZARD_CLIENT_SECRET");
 
-    println!("Getting new token...");
     
     let client = Client::new();
     let response = client
@@ -31,15 +29,12 @@ pub async fn get_oauth_token() -> Result<String, Box<dyn std::error::Error>> {
         .send()
         .await?;
 
-    println!("Token response status: {}", response.status());
-    
     if !response.status().is_success() {
         println!("Error response body: {:?}", response.text().await?);
         return Err("Failed to get token".into());
     }
 
     let token_response: TokenResponse = response.json().await?;
-    println!("Received new token: {}", token_response.access_token);
 
     {
         let mut token = ACCESS_TOKEN.lock().unwrap();

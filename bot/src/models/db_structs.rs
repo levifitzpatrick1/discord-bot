@@ -56,7 +56,7 @@ pub trait DbOperations {
 }
 impl DbOperations for Material {
     fn insert(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "INSERT INTO materials (guid, wow_id, name, rank) VALUES (?1, ?2, ?3, ?4)",
@@ -66,7 +66,7 @@ impl DbOperations for Material {
     }
 
     fn update(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "UPDATE materials SET wow_id = ?1, name = ?2, rank = ?3 WHERE guid = ?4",
@@ -76,7 +76,7 @@ impl DbOperations for Material {
     }
 
     fn delete(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute("DELETE FROM materials WHERE guid = ?1", params![self.guid])?;
         Ok(())
@@ -84,7 +84,7 @@ impl DbOperations for Material {
 }
 impl DbOperations for Recipe {
     fn insert(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "INSERT INTO recipes (guid, wow_id, name, profession) VALUES (?1, ?2, ?3, ?4)",
@@ -94,7 +94,7 @@ impl DbOperations for Recipe {
     }
 
     fn update(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "UPDATE recipes SET wow_id = ?1, name = ?2, profession = ?3 WHERE guid = ?4",
@@ -104,7 +104,7 @@ impl DbOperations for Recipe {
     }
 
     fn delete(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute("DELETE FROM recipes WHERE guid = ?1", params![self.guid])?;
         Ok(())
@@ -112,7 +112,7 @@ impl DbOperations for Recipe {
 }
 impl DbOperations for RecipeMaterial {
     fn insert(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "INSERT INTO recipe_materials (recipe_guid, material_guid, quantity) VALUES (?1, ?2, ?3)",
@@ -122,7 +122,7 @@ impl DbOperations for RecipeMaterial {
     }
 
     fn update(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "UPDATE recipe_materials SET material_guid = ?1, quantity = ?2 WHERE recipe_guid = ?3",
@@ -132,7 +132,7 @@ impl DbOperations for RecipeMaterial {
     }
 
     fn delete(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute("DELETE FROM recipe_materials WHERE recipe_guid = ?1 AND material_guid = ?2", 
                      params![self.recipe_guid, self.material_guid])?;
@@ -141,7 +141,7 @@ impl DbOperations for RecipeMaterial {
 }
 impl DbOperations for Character {
     fn insert(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "INSERT INTO characters (guid, name, server, guild, score, level) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
@@ -151,7 +151,7 @@ impl DbOperations for Character {
     }
 
     fn update(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "UPDATE characters SET name = ?1, server = ?2, guild = ?3 score = ?4, level = ?5 WHERE guid = ?6",
@@ -161,7 +161,7 @@ impl DbOperations for Character {
     }
 
     fn delete(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute("DELETE FROM characters WHERE guid = ?1", params![self.guid])?;
         Ok(())
@@ -169,7 +169,7 @@ impl DbOperations for Character {
 }
 impl DbOperations for CharacterRecipe {
     fn insert(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "INSERT INTO character_recipes (character_guid, recipe_guid) VALUES (?1, ?2)",
@@ -179,7 +179,7 @@ impl DbOperations for CharacterRecipe {
     }
 
     fn update(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "UPDATE character_recipes SET recipe_guid = ?1 WHERE character_guid = ?2",
@@ -189,7 +189,7 @@ impl DbOperations for CharacterRecipe {
     }
 
     fn delete(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute("DELETE FROM character_recipes WHERE character_guid = ?1 AND recipe_guid = ?2", 
                      params![self.character_guid, self.recipe_guid])?;
@@ -198,7 +198,7 @@ impl DbOperations for CharacterRecipe {
 }
 impl DbOperations for Bank {
     fn insert(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "INSERT INTO bank (wow_id, material_guid, count) VALUES (?1, ?2, ?3)",
@@ -208,7 +208,7 @@ impl DbOperations for Bank {
     }
 
     fn update(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute(
             "UPDATE bank SET material_guid = ?1, count = ?2 WHERE wow_id = ?3",
@@ -218,7 +218,7 @@ impl DbOperations for Bank {
     }
 
     fn delete(&self) -> SqliteResult<()> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         conn.execute("DELETE FROM bank WHERE wow_id = ?1", params![self.wow_id])?;
         Ok(())
@@ -227,7 +227,7 @@ impl DbOperations for Bank {
 
 impl Material {
     pub fn find_by_name(name: &str) -> SqliteResult<Vec<Material>> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         let mut stmt = conn.prepare("SELECT guid, wow_id, name, rank FROM materials WHERE name LIKE ?1")?;
         let material_iter = stmt.query_map(params![format!("%{}%", name)], |row| {
@@ -244,7 +244,7 @@ impl Material {
 }
 impl Recipe {
     pub fn find_by_name(name: &str) -> SqliteResult<Vec<Recipe>> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         let mut stmt = conn.prepare("SELECT guid, wow_id, name, profession FROM recipes WHERE name LIKE ?1")?;
         let recipe_iter = stmt.query_map(params![format!("%{}%", name)], |row| {
@@ -260,7 +260,7 @@ impl Recipe {
     }
 
     pub fn get_materials(&self) -> SqliteResult<Vec<(Material, i32)>> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         let mut stmt = conn.prepare("
             SELECT m.guid, m.wow_id, m.name, m.rank, rm.quantity
@@ -286,7 +286,7 @@ impl Recipe {
 }
 impl Character {
     pub fn get_recipes(&self) -> SqliteResult<Vec<Recipe>> {
-        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
+        let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "/app/data/bot_data.db".to_string());
         let conn = Connection::open(db_url)?;
         let mut stmt = conn.prepare("
             SELECT r.guid, r.wow_id, r.name, r.profession

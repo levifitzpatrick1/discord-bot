@@ -3,7 +3,6 @@ use rusqlite::{Connection, Result};
 
 pub fn init_db() -> Result<()> {
     let db_path = get_db_path();
-    println!("db hosted at {:?}", db_path);
 
     if let Some(parent) = db_path.parent() {
         let _ = fs::create_dir_all(parent);
@@ -12,11 +11,9 @@ pub fn init_db() -> Result<()> {
     let conn = Connection::open(&db_path)?;
     conn.execute("PRAGMA foreign_keys = ON", [])?;
 
-    println!("Creating tables");
     if let Err(err) = create_tables(&conn) {
         eprintln!("Error creating tables at {:?}: {}", db_path, err)
     }
-    println!("Done creating tables");
 
     Ok(())
 }
@@ -29,7 +26,6 @@ pub fn get_db_path() -> PathBuf {
 
 
 fn create_tables(conn: &Connection) -> Result<()> {
-    //materials table
     conn.execute(
         "CREATE TABLE IF NOT EXISTS materials (
             guid TEXT PRIMARY KEY,

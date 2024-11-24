@@ -17,7 +17,6 @@ async fn main() {
     // Define commands for the bot
     let commands = vec![test(), progression(), character_progression(), craft_request(), update_character()];
 
-    // Set up the Discord bot framework
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands,
@@ -31,7 +30,6 @@ async fn main() {
         })
         .build();
 
-    // Create and run the Discord client
     let mut client = serenity::ClientBuilder::new(token, intents)
         .framework(framework)
         .await
