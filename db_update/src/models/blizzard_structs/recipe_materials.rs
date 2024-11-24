@@ -4,9 +4,11 @@ use serde::Deserialize;
 pub struct RecipeResponse {
     pub _links: Links,
     pub id: u32,
-    pub name: String,
+    pub name: Option<String>, 
+    pub description: Option<String>,
     pub media: RecipeMedia,
-    pub reagents: Vec<Reagent>
+    pub reagents: Option<Vec<Reagent>>,
+    pub modified_crafting_slots: Option<Vec<SlotType>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -41,6 +43,12 @@ pub struct ReagentItem {
 
 #[derive(Debug, Deserialize)]
 pub struct SlotType {
+    pub slot_type: SlotTypeDetails,
+    pub display_order: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SlotTypeDetails {
     pub key: Href,
     pub name: String,
     pub id: u32,

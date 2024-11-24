@@ -24,7 +24,7 @@ pub fn init_db() -> Result<()> {
 pub fn get_db_path() -> PathBuf {
     env::var("DB_PATH")
     .map(PathBuf::from)
-    .unwrap_or_else(|_| PathBuf::from("H:/Programming-stuff/Rust/discord-bot/test_db/bot_data.db"))
+    .unwrap_or_else(|_| PathBuf::from("/app/data/bot_data.db"))
 }
 
 

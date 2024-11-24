@@ -10,7 +10,7 @@ services:
       - BLIZZARD_CLIENT_ID=${BLIZZARD_CLIENT_ID}
       - BLIZZARD_CLIENT_SECRET=${BLIZZARD_CLIENT_SECRET}
       - BOT_PORT=${BOT_PORT:-8080}
-      - DATABASE_URL=sqlite:///app/data/bot.db
+      - DATABASE_URL=/app/data/bot.db
     ports:
       - "${BOT_PORT:-8080}:8080"
     volumes:
@@ -22,7 +22,9 @@ services:
     build:
       context: ./updater
     environment:
-      - DATABASE_URL=sqlite:///app/data/bot.db
+      - DATABASE_URL=/app/data/bot.db
+      - BLIZZARD_CLIENT_ID=${BLIZZARD_CLIENT_ID}
+      - BLIZZARD_CLIENT_SECRET=${BLIZZARD_CLIENT_SECRET}
     volumes:
       - bot-data:/app/data
 

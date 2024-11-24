@@ -55,7 +55,7 @@ fn format_crafting_response(recipe: &Recipe, crafters: &[Character], materials: 
 }
 
 fn get_crafters(recipe: &Recipe) -> SqliteResult<Vec<Character>> {
-    let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:///app/data/bot.db".to_string());
+    let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| "H:/Programming-stuff/Rust/discord-bot/bot-data/bot_data.db".to_string());
     let conn = Connection::open(db_url)?;
     let mut stmt = conn.prepare("
     SELECT c.guid, c.name, c.server, c.guild, c.score, c.level

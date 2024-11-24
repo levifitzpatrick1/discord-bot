@@ -1,6 +1,6 @@
 use std::time::{Duration, Instant};
 
-use reqwest::Error;
+use reqwest::{header::{HeaderMap, HeaderValue, AUTHORIZATION}, Client};
 use rusqlite::{params, Connection, Result as SqliteResult};
 use tokio::time::sleep;
 use uuid::Uuid;
@@ -91,51 +91,65 @@ async fn update_guild_roster_data(conn: &Connection) -> Result<(), Box<dyn std::
     let api_key = get_global_token();
     println!("{}", api_key);
     let guild = "mud-hut-gang";
-    let url = format!("https://{region}.api.blizzard.com/data/wow/guild/{realm_slug}/{name_slug}/roster?namespace={namespace}&locale={locale}&access_token={api_key}",
+    let url = format!("https://{region}.api.blizzard.com/data/wow/guild/{realm_slug}/{name_slug}/roster?namespace={namespace}&locale={locale}",
     region = "us",
     realm_slug = "arthas",
     name_slug = guild,
     namespace = "profile-us",
-    locale = "en_US",
-    api_key = api_key);
-    let response = reqwest::get(&url).await?;
-    println!("{}", url);
-    println!("{:?}", response);
-    // let profile: GuildRosterResponse = response.json().await?;
+    locale = "en_US");
 
-    // for member in profile.members {
-    //     println!("updating character: {}-{}", member.character.name, member.character.realm.slug);
-    //     let mut stmt = conn.prepare("SELECT level FROM characters WHERE name = ?1 AND server =?2")?;
-    //     let member_exists = stmt.exists(params![member.character.name, member.character.realm.slug])?;
+    let client = Client::new();
+    
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", api_key))?,
+    );
 
-    //     if !member_exists {
-    //         conn.execute("INSERT INTO characters (guid, name, server, guild, level) VALUES (?, ?, ?, ?, ?)",
-    //          params![generate_guid(), member.character.name, member.character.realm.slug, guild, member.character.level])?;
-    //     } else {
-    //         let db_level: u32 = conn.query_row("SELECT level FROM characters WHERE name = ?1 AND server = ?2", params![member.character.name, member.character.realm.slug], |row| row.get(0),)?;
+    let response = client.get(&url).headers(headers).send().await?;
+    let profile: GuildRosterResponse = response.json().await?;
 
-    //         if db_level != member.character.level {
-    //             conn.execute("UPDATE characters SET level = ?1 WHERE name = ?2 AND server =?3", params![member.character.level, member.character.name, member.character.realm.slug])?;
+    for member in profile.members {
+        println!("updating character: {}-{}", member.character.name, member.character.realm.slug);
+        let mut stmt = conn.prepare("SELECT level FROM characters WHERE name = ?1 AND server =?2")?;
+        let member_exists = stmt.exists(params![member.character.name, member.character.realm.slug])?;
 
-    //         }
-    //     }
-    // }
+        if !member_exists {
+            conn.execute("INSERT INTO characters (guid, name, server, guild, level) VALUES (?, ?, ?, ?, ?)",
+             params![generate_guid(), member.character.name, member.character.realm.slug, guild, member.character.level])?;
+        } else {
+            let db_level: u32 = conn.query_row("SELECT level FROM characters WHERE name = ?1 AND server = ?2", params![member.character.name, member.character.realm.slug], |row| row.get(0),)?;
+
+            if db_level != member.character.level {
+                conn.execute("UPDATE characters SET level = ?1 WHERE name = ?2 AND server =?3", params![member.character.level, member.character.name, member.character.realm.slug])?;
+
+            }
+        }
+    }
 
     Ok(())
 }
 
-async fn fetch_character_score_data(name: &str, server: &str) -> Result<MythicKeystoneProfileResponse, Error> {
+async fn fetch_character_score_data(name: &str, server: &str) -> Result<MythicKeystoneProfileResponse, Box<dyn std::error::Error>> {
     let api_key = get_global_token();
-    let url = format!("https://{region}.api.blizzard.com/profile/wow/character/{realm_slug}/{character_name}/mythic-keystone-profile/season/{seasonId}?namespace={namespace}&locale={locale}&access_token={api_key}",
+    let url = format!("https://{region}.api.blizzard.com/profile/wow/character/{realm_slug}/{character_name}/mythic-keystone-profile/season/{seasonId}?namespace={namespace}&locale={locale}",
     region = "us",
     realm_slug = server.to_lowercase(),
     character_name = name.to_lowercase(),
     seasonId = 13,
     namespace = "profile-us",
-    locale = "en_US",
-    api_key = api_key);
+    locale = "en_US");
 
-    let response = reqwest::get(&url).await?;
+    let client = Client::new();
+    
+    
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", api_key))?,
+    );
+
+    let response = client.get(&url).headers(headers).send().await?;
 
     let profile: MythicKeystoneProfileResponse = response.json().await?;
 
@@ -150,17 +164,24 @@ fn update_character_score_data(conn: &Connection, score: f64, character: &Charac
     Ok(())
 }
 
-async fn fetch_character_professions_data(name: &str, server: &str) -> Result<ProfileResponse, Error> {
+async fn fetch_character_professions_data(name: &str, server: &str) -> Result<ProfileResponse, Box<dyn std::error::Error>> {
     let api_key = get_global_token();
-    let url = format!("https://{region}.api.blizzard.com/profile/wow/character/{realm_slug}/{character_name}/professions?namespace={namespace}&locale={locale}&access_token={api_key}",
+    let url = format!("https://{region}.api.blizzard.com/profile/wow/character/{realm_slug}/{character_name}/professions?namespace={namespace}&locale={locale}",
     region = "us",
     realm_slug = server.to_lowercase(),
     character_name = name.to_lowercase(),
     namespace = "profile-us",
-    locale = "en_US",
-    api_key = api_key);
+    locale = "en_US");
 
-    let response = reqwest::get(&url).await?;
+    let client = Client::new();
+    
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", api_key))?,
+    );
+
+    let response = client.get(&url).headers(headers).send().await?;
 
     let profile: ProfileResponse = response.json().await?;
 
@@ -172,7 +193,7 @@ async fn update_character_profession_data(conn: &Connection, character: &Charact
     
     for profession in &professions.primaries {
         for tier in &profession.tiers {
-            if !tier.tier.name.contains("Algari") {
+            if !tier.tier.name.contains("Khaz Algar") {
                 println!("Skipping non-War Within tier: {}", tier.tier.name);
                 continue;
             }
@@ -223,6 +244,11 @@ async fn fetch_and_sync_recipes(conn: &Connection, recipes_from_api: &[RecipeAPI
         if !recipe_exists {
             recipe_guid = generate_guid();
             conn.execute("INSERT INTO recipes (guid, wow_id, name, profession, teir) VALUES (?, ?, ?, ?, ?)", params![recipe_guid, recipe.id, recipe.name, profession, teir])?;
+
+            if let Err(err) = fetch_and_sync_materials(conn, recipe.id).await {
+                eprintln!("Failed to sync materials for recipe {}: {}", recipe.name, err);
+            }
+
         } else {
             recipe_guid = conn.query_row("SELECT guid FROM recipes WHERE wow_id = ?1", params![recipe.id], |row| row.get(0))?;
         }
@@ -234,9 +260,6 @@ async fn fetch_and_sync_recipes(conn: &Connection, recipes_from_api: &[RecipeAPI
             profession: profession.clone()
         });
 
-        if let Err(err) = fetch_and_sync_materials(conn, recipe.id).await {
-            eprintln!("Failed to sync materials for recipe {}: {}", recipe.name, err);
-        }
     }
 
     Ok(db_recipes)
@@ -244,45 +267,60 @@ async fn fetch_and_sync_recipes(conn: &Connection, recipes_from_api: &[RecipeAPI
 
 async fn fetch_and_sync_materials(conn: &Connection, recipe_id: u32) -> Result<HashMap<MaterialDB, u32>, Box<dyn std::error::Error>> {
     let api_key = get_global_token();
-    let url = format!("https://{region}.api.blizzard.com/data/wow/recipe/{recipeId}?namespace=static-{namespace}&locale={locale}&access_token={api_key}",
+    let url = format!("https://{region}.api.blizzard.com/data/wow/recipe/{recipeId}?namespace=static-{namespace}&locale={locale}",
     region = "us",
     recipeId = recipe_id,
     namespace = "us",
-    locale = "en_US",
-    api_key = api_key);
+    locale = "en_US");
 
-    let response = reqwest::get(&url).await?;
+    let client = Client::new();
+    
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", api_key))?,
+    );
+
+
+
+    let response = client.get(&url).headers(headers).send().await?;
 
     let profile: RecipeResponse = response.json().await?;
 
 
     let mut db_materials: HashMap<MaterialDB, u32> = HashMap::new();
 
-    for reagent in profile.reagents {
-        let mut stmt = conn.prepare("Select guid, wow_id, name, rank FROM materials WHERE wow_id = ?1")?;
-        let material_exists = stmt.exists(params![reagent.reagent.id])?;
+    if let Some(reagents) = profile.reagents {
+        for reagent in reagents {
+            let mut stmt = conn.prepare("Select guid, wow_id, name, rank FROM materials WHERE wow_id = ?1")?;
+            let material_exists = stmt.exists(params![reagent.reagent.id])
+        .map_err(|e| format!("Failed to check material existence: {}", e))?;
 
-        if !material_exists {
-            conn.execute("INSERT INTO materials (guid, wow_id, name, rank) VALUES (?, ?, ?, ?)", params![generate_guid(), reagent.reagent.id, reagent.reagent.name, 3])?;
+
+            if !material_exists {
+                conn.execute("INSERT INTO materials (guid, wow_id, name, rank) VALUES (?, ?, ?, ?)", params![generate_guid(), reagent.reagent.id, reagent.reagent.name, 3])?;
+            }
+
+            let mut stmt = conn.prepare("SELECT guid, wow_id, name, rank FROM materials WHERE wow_id = ?1")?;
+            let mut rows = stmt.query(params![reagent.reagent.id])?;
+
+            while let Some(row) = rows.next()? {
+                db_materials.insert(MaterialDB {
+                    guid: row.get(0)?,
+                    wow_id: row.get(1)?,
+                    name: row.get(2)?,
+                    rank: row.get(3)?
+                    },
+                    reagent.quantity,
+                );
+            }
         }
-
-        let mut stmt = conn.prepare("SELECT guid, wow_id, name, rank FROM materials WHERE wow_id = ?1")?;
-        let mut rows = stmt.query(params![reagent.reagent.id])?;
-
-        while let Some(row) = rows.next()? {
-            db_materials.insert(MaterialDB {
-                guid: row.get(0)?,
-                wow_id: row.get(1)?,
-                name: row.get(2)?,
-                rank: row.get(3)?
-                },
-                reagent.quantity,
-            );
-        }
+    } else {
+        println!("No reagents found for recipe ID: {}", recipe_id);
     }
 
 
-    Ok(db_materials)
+     Ok(db_materials)
 }
 
 fn generate_guid() -> String {
