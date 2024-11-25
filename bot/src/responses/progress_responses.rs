@@ -22,7 +22,7 @@ pub async fn character_progression(
 ) -> Result<(), poise_Error> {
     let _ = ctx.defer().await;
     let proper_character_name = to_title_case(&character_name);
-    let proper_character_server = character_server.to_ascii_lowercase();
+    let proper_character_server = character_server.to_ascii_lowercase().replace(" ", "-");
 
     let name = proper_character_name.clone();
     let server = proper_character_server.clone();

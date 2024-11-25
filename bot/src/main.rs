@@ -15,7 +15,7 @@ async fn main() {
     let intents = serenity::GatewayIntents::non_privileged();
 
     // Define commands for the bot
-    let commands = vec![test(), progression(), character_progression(), craft_request(), update_character()];
+    let commands = vec![progression(), character_progression(), craft_request(), update_character()];
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {

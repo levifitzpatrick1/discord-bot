@@ -13,6 +13,12 @@ pub async fn craft_request(
     #[description = "Name of Item to craft"] item_name: String,
 ) -> Result<(), poise_Error> {
     let _ = ctx.defer();
+
+    if item_name.to_ascii_lowercase() == "ligma" {
+        ctx.say("balls").await?;
+        return Ok(());
+    }
+
     let recipes = Recipe::find_by_name(&item_name)?;
     
     if recipes.is_empty() {
