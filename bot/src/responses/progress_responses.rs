@@ -46,7 +46,7 @@ pub async fn update_character(
     let _ = ctx.defer().await;
 
     let proper_character_name = to_title_case(&character_name);
-    let proper_character_server = character_server.to_ascii_lowercase();
+    let proper_character_server = character_server.to_ascii_lowercase().replace(" ", "-");
 
     let score = fetch_character_from_raider_io(&proper_character_name, &proper_character_server).await?;
 
